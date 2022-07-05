@@ -1,51 +1,86 @@
 package main
 
 import (
-	"time"
+	"backend/cors"
+	"backend/db"
+	"strconv"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func main(){
 	router := gin.Default()
-	router.Use(cors.New(cors.Config{
-        // 許可したいHTTPメソッドの一覧
-        AllowMethods: []string{
-            "POST",
-            "GET",
-            "OPTIONS",
-            "PUT",
-            "DELETE",
-        },
-        // 許可したいHTTPリクエストヘッダの一覧
-        AllowHeaders: []string{
-            "Access-Control-Allow-Headers",
-			"Access-Control-Allow-Origin",
-            "Content-Type",
-            "Content-Length",
-            "Accept-Encoding",
-            "X-CSRF-Token",
-            "Authorization",
-        },
-        // 許可したいアクセス元の一覧
-        AllowOrigins: []string{
-            "http://localhost:3000",
-        },
-        // 自分で許可するしないの処理を書きたい場合は、以下のように書くこともできる
-        // AllowOriginFunc: func(origin string) bool {
-        //  return origin == "https://www.example.com:8080"
-        // },
-        // preflight requestで許可した後の接続可能時間
-        // https://godoc.org/github.com/gin-contrib/cors#Config の中のコメントに詳細あり
-		MaxAge: 24 * time.Hour,
-    }))
+	cors.Cors(router)
 
-	router.GET("/", func(c *gin.Context){
-		c.JSON(200, gin.H{
-			"message": "hello, world",
-		})
-	})
+	db.DbInit()
 
-	router.Run()
+	//Index
+	router.GET("/", func(ctx *gin.Context) {
+        todos := db.DbGetAll()
+        ctx.JSON(200, gin.H{
+            "todos": todos,
+        })
+    })
+
+    //Create
+    router.POST("/new", func(ctx *gin.Context) {
+        text := ctx.PostForm("text")
+        status := ctx.PostForm("status")
+        db.DbInsert(text, status)
+        // ctx.Redirect(302, "/")
+    })
+
+    //Detail
+    router.GET("/detail/:id", func(ctx *gin.Context) {
+        n := ctx.Param("id")
+        id, err := strconv.Atoi(n)
+        if err != nil {
+            panic(err)
+        }
+        todo := db.DbGetOne(id)
+        ctx.JSON(200, gin.H{"todo": todo})
+    })
+
+    //Update
+    router.POST("/update/:id", func(ctx *gin.Context) {
+        n := ctx.Param("id")
+        id, err := strconv.Atoi(n)
+        if err != nil {
+            panic("ERROR")
+        }
+        text := ctx.PostForm("text")
+        status := ctx.PostForm("status")
+        db.DbUpdate(id, text, status)
+        // ctx.Redirect(302, "/")
+    })
+
+    //削除確認
+    router.GET("/delete_check/:id", func(ctx *gin.Context) {
+        n := ctx.Param("id")
+        id, err := strconv.Atoi(n)
+        if err != nil {
+            panic("ERROR")
+        }
+        todo := db.DbGetOne(id)
+        ctx.JSON(200, gin.H{"todo": todo})
+    })
+
+    //Delete
+    router.POST("/delete/:id", func(ctx *gin.Context) {
+        n := ctx.Param("id")
+        id, err := strconv.Atoi(n)
+        if err != nil {
+            panic("ERROR")
+        }
+        db.DbDelete(id)
+        // ctx.Redirect(302, "/")
+    })
+
+    router.Run()
+	// router.GET("/", func(c *gin.Context){
+	// 	c.JSON(200, gin.H{
+	// 		"message": "hello, world",
+	// 	})
+	// })
+
 }
