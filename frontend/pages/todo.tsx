@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import fetch from "isomorphic-unfetch";
 import Mapdata from "../compornent/Mapdata";
 
 interface props {
@@ -22,53 +21,17 @@ interface Api {
   config?: any;
 }
 
-// const Ak: React.FC<props[]> = (data) => {
-//   return (
-//     <div>
-//       {data.map((val) => {
-//         return (
-//           <div key={val.id}>
-//             <ul>
-//               <li>
-//                 {val.id}内容：{val.text}、状態：{val.status}
-//                 <label>
-//                   <a href="/detail/{{.ID}}">編集</a>
-//                 </label>
-//                 <label>
-//                   <a href="/delete_check/{{.ID}}">削除</a>
-//                 </label>
-//               </li>
-//             </ul>
-//           </div>
-//         );
-//       })}
-//     </div>
-//   );
-// };
-
 const Todo = () => {
   const defval: props[] = [{ ID: -1, Text: "", Status: "", message: "" }];
-  //  [ { todos:{ id: -1, text: "", status: "", message: "" } }
-  var check = false;
-  //const def: Api = { data: defval, status: 0, statusText: "" };
   const [hello, setHello] = useState<props[]>(defval);
   const [status, setStatus] = useState<string>("");
   const [text, setText] = useState<string>("");
+
   useEffect(() => {
     const gethello = async () => {
       const res = await axios.get(`http://localhost:8080`);
       console.log(res);
       setHello(res.data.todos);
-      // const tmp: Api = await res.data;
-      // if (tmp.data === undefined) {
-      //   return;
-      // }
-      // await setHello(tmp.data.todos);
-      //console.log(hello);
-      // const temp = JSON.parse(JSON.stringify(res.data));
-      // console.log(temp);
-      // const datas: data[] = temp.data ?? defval;
-      // setHello(datas);
     };
     try {
       gethello();
@@ -82,12 +45,9 @@ const Todo = () => {
       const postdata = { Status: status, Text: text };
       const res = await axios.post(`http://localhost:8080/new`, postdata);
       console.log(res);
-      // const res1 = await axios.post(`http://localhost:8080/new`, text);
-      // console.log(res1);
     };
     try {
       postData();
-      check = !check;
     } catch (err) {
       console.error(err);
     }
@@ -118,55 +78,9 @@ const Todo = () => {
           <input type="submit" value="Send" onClick={postTodo} />
         </p>
       </form>
-      {/* <Ak data={hello} /> */}
       <Mapdata props={hello} />
-      {/* {hello.map((val) => {
-        console.log("map", hello);
-        return (
-          <div key={val.id}>
-            <ul>
-              <li>
-                {val.id}内容：{val.text}、状態：{val.status}
-                <label>
-                  <a href="/detail/{{.ID}}">編集</a>
-                </label>
-                <label>
-                  <a href="/delete_check/{{.ID}}">削除</a>
-                </label>
-              </li>
-            </ul>
-          </div>
-        );
-      })} */}
     </div>
   );
 };
-
-// Todo.getInitialProps = async () => {
-//   const defval: props[] = [{ id: -1, text: "", status: "", message: "" }];
-//   const gethello = async () => {
-//     const res = await axios.get(`http://localhost:8080`);
-//     console.log(res);
-//     const tmp: Api = res.data;
-//     if (tmp.data === undefined) {
-//       return { props: defval };
-//     }
-//     const data = tmp.data.todos;
-//     return { props: data };
-//     // setHello(tmp.data.todos);
-//     // console.log(hello);
-//     // const temp = JSON.parse(JSON.stringify(res.data));
-//     // console.log(temp);
-//     // const datas: data[] = temp.data ?? defval;
-//     // setHello(datas);
-//   };
-//   try {
-//     gethello();
-//   } catch (err) {
-//     console.error(err);
-//     return { props: defval };
-//   }
-//   return { props: defval };
-// };
 
 export default Todo;
