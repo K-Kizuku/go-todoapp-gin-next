@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -25,8 +27,11 @@ func DbInit() {
 func DbInsert(text string, status string) {
     db, err := gorm.Open("sqlite3", "test.sqlite3")
     if err != nil {
+		fmt.Println("out")
         panic("データベース開けず！（dbInsert)")
+		
     }
+	fmt.Println("ok")
     db.Create(&Todo{Text: text, Status: status})
     defer db.Close()
 }

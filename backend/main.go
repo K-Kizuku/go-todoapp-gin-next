@@ -3,6 +3,7 @@ package main
 import (
 	"backend/cors"
 	"backend/db"
+	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -24,9 +25,11 @@ func main(){
 
     //Create
     router.POST("/new", func(ctx *gin.Context) {
-        text := ctx.PostForm("text")
-        status := ctx.PostForm("status")
-        db.DbInsert(text, status)
+		var data db.Todo
+        ctx.BindJSON(&data)
+        //status := ctx.PostForm("status")
+        db.DbInsert(data.Text, data.Status)
+		fmt.Println(data.Text)
         // ctx.Redirect(302, "/")
     })
 
