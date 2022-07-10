@@ -6,12 +6,22 @@ import (
 	"fmt"
 	"strconv"
 
+	docs "backend/docs"
+
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title gin-swagger todos
+// @version 1.0
+// @license.name kosuke
+// @description このswaggerはgin-swaggerの見本apiです
 func main(){
 	router := gin.Default()
 	cors.Cors(router)
+
+    docs.SwaggerInfo.BasePath = "/api/v1"
 
 	db.DbInit()
 
@@ -78,6 +88,8 @@ func main(){
         db.DbDelete(id)
         // ctx.Redirect(302, "/")
     })
+
+    router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
     router.Run()
 	// router.GET("/", func(c *gin.Context){

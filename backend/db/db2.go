@@ -33,7 +33,6 @@ func DbInsertName(name string) uint{
     db.Create(&Account{Name: name})
     var account Account
     db.Find(&account, name)
-    db.S
     defer db.Close()
     return account.ID
 }
